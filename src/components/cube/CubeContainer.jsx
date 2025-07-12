@@ -1,7 +1,5 @@
-import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import React from 'react'
-import Cube from './cube'
+import Cube from './Cube'
 import Image from './image'
 
 const CubeContainer = () => {
