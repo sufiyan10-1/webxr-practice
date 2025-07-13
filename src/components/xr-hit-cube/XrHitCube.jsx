@@ -2,7 +2,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { Interactive, useHitTest, useXR } from "@react-three/xr";
 import { useRef, useState } from "react";
-import Image from "./Image";
+import Cube from "./Cube";
 
 const XrHitCube = () => {
   const reticleRef = useRef();
@@ -38,7 +38,7 @@ const XrHitCube = () => {
       <ambientLight />
       {isPresenting &&
         cubes.map(({ position, id }) => {
-          return <Image key={id} position={position} />;
+          return <Cube key={id} position={position} />;
         })}
       {isPresenting && (
         <Interactive onSelect={placeCube}>
@@ -49,7 +49,7 @@ const XrHitCube = () => {
         </Interactive>
       )}
 
-      {!isPresenting && <Image />}
+      {!isPresenting && <Cube />}
     </>
   );
 };
