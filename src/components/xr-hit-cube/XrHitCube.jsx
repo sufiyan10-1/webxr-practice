@@ -6,7 +6,8 @@ import Cube from "./Cube";
 
 const XrHitCube = () => {
   const reticleRef = useRef();
-  const [cubes, setCubes] = useState([]);
+  const [cubePosition, setCubePosition] = useState(null);
+  const [placed, setPlaced] = useState(false);
 
   const { isPresenting } = useXR();
 
@@ -16,31 +17,35 @@ const XrHitCube = () => {
     }
   });
 
-  useHitTest((hitMatrix, hit) => {
-    hitMatrix.decompose(
-      reticleRef.current.position,
-      reticleRef.current.quaternion,
-      reticleRef.current.scale
-    );
-
-    reticleRef.current.rotation.set(-Math.PI / 2, 0, 0);
+  useHitTest((hitMatrix) => {
+    if (reticleRef.current && !placed) {
+      hitMatrix.decompose(
+        reticleRef.current.position,
+        reticleRef.current.quaternion,
+        reticleRef.current.scale
+      );
+      reticleRef.current.rotation.set(-Math.PI / 2, 0, 0);
+    }
   });
 
-  const placeCube = (e) => {
-    let position = e.intersection.object.position.clone();
-    let id = Date.now();
-    setCubes([...cubes, { position, id }]);
+  const placeCube = () => {
+    if (!placed && reticleRef.current) {
+      const position = reticleRef.current.position.clone();
+      setCubePosition(position);
+      setPlaced(true);
+    }
   };
 
   return (
     <>
       <OrbitControls />
       <ambientLight />
-      {isPresenting &&
-        cubes.map(({ position, id }) => {
-          return <Cube key={id} position={position} />;
-        })}
-      {isPresenting && (
+
+      {/* Only show cube if placed and in AR */}
+      {isPresenting && cubePosition && <Cube position={cubePosition} />}
+
+      {/* Reticle only visible before placement */}
+      {isPresenting && !placed && (
         <Interactive onSelect={placeCube}>
           <mesh ref={reticleRef} rotation-x={-Math.PI / 2}>
             <ringGeometry args={[0.1, 0.25, 32]} />
@@ -49,6 +54,7 @@ const XrHitCube = () => {
         </Interactive>
       )}
 
+      {/* Fallback cube in non-AR mode */}
       {!isPresenting && <Cube />}
     </>
   );
